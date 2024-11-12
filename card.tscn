@@ -1,0 +1,30 @@
+[gd_scene load_steps=6 format=3 uid="uid://drgdvrdxecrog"]
+
+[ext_resource type="Script" path="res://cardClicked.gd" id="2_sqjot"]
+[ext_resource type="Script" path="res://cardScript.gd" id="2_x4u8a"]
+[ext_resource type="Texture2D" uid="uid://dcm2b5onbssbw" path="res://assets_real/card0.png" id="3_3m7lg"]
+[ext_resource type="Script" path="res://Sprite.gd" id="4_pg31u"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_0r2vc"]
+size = Vector2(240, 336)
+
+[node name="card" type="Node2D"]
+script = ExtResource("2_x4u8a")
+
+[node name="cardArea" type="Area2D" parent="."]
+script = ExtResource("2_sqjot")
+
+[node name="cardCollision" type="CollisionShape2D" parent="cardArea"]
+shape = SubResource("RectangleShape2D_0r2vc")
+
+[node name="cardSprite" type="Sprite2D" parent="cardArea"]
+texture = ExtResource("3_3m7lg")
+script = ExtResource("4_pg31u")
+
+[connection signal="flipToBack" from="." to="cardArea/cardSprite" method="_on_card_flip_to_back"]
+[connection signal="flipToFront" from="." to="cardArea/cardSprite" method="_on_card_flip_to_front"]
+[connection signal="whichSprite" from="." to="cardArea/cardSprite" method="_on_card_which_sprite"]
+[connection signal="input_event" from="cardArea" to="." method="_on_character_body_2d_input_event"]
+[connection signal="onClick" from="cardArea" to="." method="_on_card_area_on_click"]
+[connection signal="onEnter" from="cardArea" to="." method="_on_card_area_on_enter"]
+[connection signal="onExit" from="cardArea" to="." method="_on_card_area_on_exit"]
