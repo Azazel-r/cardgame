@@ -1,27 +1,28 @@
 extends Node2D
 
+# signals
 signal whichSprite
+signal flipToBack
+signal flipToFront
+
+# general variables
 var spriteNum := 1
-var interactable := false
-var hovering := false
 var cardNumber : int
-var inTransition := false
 
 # transform variables
 var startPos := Vector2(0,0)
-const SECONDS : float = 0.66
-var back := false
+const SECONDS := 0.66
+const FLIPTIME := 0.5
 var addSkew : float = 0
-signal flipToBack
-signal flipToFront
+
+# bools
+var back := false
+var inTransition := false
+var interactable := false
+var hovering := false
 var onStack : bool
 
-# scaling variables
-var scaling := false
-const SCALESTART := 1
-const SCALEEND := 1.2
-const SCALESECONDS := 0.5
-var currentScale := 1.0
+# tween stuff
 var tween : Tween = null
 var tween2 : Tween = null
 var tweenTurn : Tween = null
@@ -78,8 +79,8 @@ func flipCard(secs : float) -> void:
 		back = true
 	else:
 		tweenTurn = create_tween()
-		tweenTurn.tween_property($cardArea, "skew", PI, 0.5).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
-		tweenTurn.parallel().tween_callback(flipToFront.emit).set_delay(0.25)
+		tweenTurn.tween_property($cardArea, "skew", PI, secs).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
+		tweenTurn.parallel().tween_callback(flipToFront.emit).set_delay(secs/2)
 		addSkew = PI
 		back = false
 
@@ -113,11 +114,11 @@ func resetTweensNoEase() -> void:
 func _on_card_area_on_click() -> void:
 	if !onStack and interactable:
 		resetTweens()
-		flipCard(0.5)
+		flipCard(FLIPTIME)
 		interactable = false
 		var tmpTween = create_tween()
-		tmpTween.tween_callback(makeMeInteractable).set_delay(0.5)
-		tmpTween.parallel().tween_callback(hoverAnimation).set_delay(0.5)
+		tmpTween.tween_callback(makeMeInteractable).set_delay(FLIPTIME)
+		tmpTween.parallel().tween_callback(hoverAnimation).set_delay(FLIPTIME)
 
 func _on_card_area_on_enter() -> void:
 	hovering = true
