@@ -1,7 +1,5 @@
 extends Node
 
-const deck := preload("res://deck.tscn")
-var newDeck
 var window
 const windowSize = Vector2i(1920,1080) #Vector2i(1280,720) #
 
@@ -10,10 +8,14 @@ func _ready() -> void:
 	window = get_window()
 	window.size = windowSize
 	window.move_to_center()
-	newDeck = deck.instantiate()
-	newDeck.setWindowSize(windowSize)
-	add_child(newDeck)
+	$DrawPile.setWindowSize(windowSize)
+	$DrawPile.shuffle()
+	$shuffleButton.position = Vector2(windowSize.x * 0.1, windowSize.y * 0.5)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	pass
+
+
+func _on_button_pressed() -> void:
+	$DrawPile.shuffle()

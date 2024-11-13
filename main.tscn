@@ -1,6 +1,33 @@
-[gd_scene load_steps=2 format=3 uid="uid://mkx1vpfp82w8"]
+[gd_scene load_steps=6 format=3 uid="uid://mkx1vpfp82w8"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_afoxg"]
+[ext_resource type="Script" path="res://shuffleButton.gd" id="2_o5w74"]
+[ext_resource type="Script" path="res://drawPile.gd" id="3_tts2i"]
+[ext_resource type="Script" path="res://deckClicked.gd" id="4_5pbdj"]
 
-[node name="Node" type="Node"]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_st6r8"]
+size = Vector2(240, 336)
+
+[node name="main" type="Node"]
 script = ExtResource("1_afoxg")
+
+[node name="shuffleButton" type="Button" parent="."]
+offset_right = 117.0
+offset_bottom = 51.0
+text = "Shuffle"
+script = ExtResource("2_o5w74")
+
+[node name="Hand" type="Node2D" parent="."]
+
+[node name="DrawPile" type="Node2D" parent="."]
+script = ExtResource("3_tts2i")
+
+[node name="drawPileArea" type="Area2D" parent="DrawPile"]
+script = ExtResource("4_5pbdj")
+
+[node name="drawPileCollision" type="CollisionShape2D" parent="DrawPile/drawPileArea"]
+shape = SubResource("RectangleShape2D_st6r8")
+
+[node name="DiscardPile" type="Node2D" parent="."]
+
+[connection signal="pressed" from="shuffleButton" to="." method="_on_button_pressed"]

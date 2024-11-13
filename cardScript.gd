@@ -8,6 +8,7 @@ signal flipToFront
 # general variables
 var spriteNum := 1
 var cardNumber : int
+var zindexchange : int
 
 # transform variables
 var startPos := Vector2(0,0)
@@ -43,7 +44,7 @@ func _process(delta: float) -> void:
 	pass
 
 
-func comeToHand(handpos : Vector2, drawn = null, space = null) -> void:
+func comeToHand(handpos : Vector2, drawn : int) -> void:
 	if onStack:
 		onStack = false
 		inTransition = true
@@ -53,6 +54,7 @@ func comeToHand(handpos : Vector2, drawn = null, space = null) -> void:
 		tweenToHand.parallel().tween_callback(makeMeInteractable).set_delay(SECONDS)
 		tweenToHand.parallel().tween_callback(makeTransitionStop).set_delay(SECONDS)
 		tweenToHand.parallel().tween_callback(hoverAnimation).set_delay(SECONDS)
+		z_index = drawn
 		
 func makeMeInteractable() -> void:
 	interactable = true
@@ -63,9 +65,10 @@ func makeTransitionStop() -> void:
 func setSpriteNum(n : int) -> void:
 	spriteNum = n
 
-func setPos(start : Vector2, num : int) -> void:
+func setPos(start : Vector2, num : int, z : int) -> void:
 	startPos = start
 	cardNumber = num
+	zindexchange = z
 	
 func flipCard(secs : float) -> void:
 	if !back:
@@ -93,6 +96,8 @@ func hoverAnimation() -> void:
 		tween2.tween_property($cardArea, "skew", addSkew + PI/16, 3).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
 		tween2.tween_property($cardArea, "skew", addSkew - PI/16, 3).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
 		tween2.set_loops()
+		if !onStack:
+			z_index += zindexchange
 
 func resetTweens() -> void:
 	if tween != null:
@@ -102,6 +107,8 @@ func resetTweens() -> void:
 	tween = create_tween()
 	tween.tween_property($cardArea, "skew", addSkew, 0.15).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_SINE)
 	tween.parallel().tween_property($cardArea, "scale", Vector2(1,1), 0.15).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_SINE)
+	if !onStack:
+		z_index -= zindexchange
 
 func resetTweensNoEase() -> void:
 	if tween != null:
@@ -110,6 +117,9 @@ func resetTweensNoEase() -> void:
 		tween2.kill()
 	$cardArea.skew = addSkew
 	$cardArea.scale = Vector2(1,1)
+	if !onStack:
+		z_index -= zindexchange
+	
 
 func _on_card_area_on_click() -> void:
 	if !onStack and interactable:
