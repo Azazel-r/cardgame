@@ -10,6 +10,7 @@ func _ready() -> void:
 	window.move_to_center()
 	$DrawPile.setWindowSize(windowSize)
 	$DrawPile.shuffle()
+	$Hand.windowSize = windowSize
 	$shuffleButton.position = Vector2(windowSize.x * 0.1, windowSize.y * 0.5)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -24,4 +25,6 @@ func _on_button_pressed() -> void:
 func _on_draw_pile_card_drawn_signal(card : Node2D, cardsDrawn : int) -> void:
 	$Transition.add_child(card)
 	$Transition.cardsDrawn = cardsDrawn
+	var handpos = $Hand.makeSpace(cardsDrawn)
+	
 	

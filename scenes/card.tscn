@@ -1,9 +1,9 @@
 [gd_scene load_steps=6 format=3 uid="uid://drgdvrdxecrog"]
 
-[ext_resource type="Script" path="res://cardClicked.gd" id="2_sqjot"]
-[ext_resource type="Script" path="res://cardScript.gd" id="2_x4u8a"]
+[ext_resource type="Script" path="res://scripts/cardClicked.gd" id="2_sqjot"]
+[ext_resource type="Script" path="res://scripts/cardScript.gd" id="2_x4u8a"]
 [ext_resource type="Texture2D" uid="uid://dcm2b5onbssbw" path="res://assets_real/card0.png" id="3_3m7lg"]
-[ext_resource type="Script" path="res://Sprite.gd" id="4_pg31u"]
+[ext_resource type="Script" path="res://scripts/Sprite.gd" id="4_pg31u"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_0r2vc"]
 size = Vector2(240, 336)

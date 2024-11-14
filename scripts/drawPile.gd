@@ -1,7 +1,7 @@
 extends Node2D
 
 # card scene
-const cardScene := preload("res://card.tscn")
+const cardScene := preload("res://scenes/card.tscn")
 
 # just some general variables
 const DOWNTIME := 0.66

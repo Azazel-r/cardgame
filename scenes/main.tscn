@@ -1,32 +1,32 @@
 [gd_scene load_steps=8 format=3 uid="uid://mkx1vpfp82w8"]
 
-[ext_resource type="Script" path="res://main.gd" id="1_afoxg"]
-[ext_resource type="Script" path="res://shuffleButton.gd" id="2_o5w74"]
-[ext_resource type="Script" path="res://hand.gd" id="3_a0yt4"]
-[ext_resource type="Script" path="res://drawPile.gd" id="3_tts2i"]
-[ext_resource type="Script" path="res://deckClicked.gd" id="4_5pbdj"]
-[ext_resource type="Script" path="res://transition.gd" id="5_y3wl2"]
+[ext_resource type="Script" path="res://scripts/main.gd" id="1_dle0m"]
+[ext_resource type="Script" path="res://scripts/shuffleButton.gd" id="2_6l4ew"]
+[ext_resource type="Script" path="res://scripts/hand.gd" id="3_ivtwn"]
+[ext_resource type="Script" path="res://scripts/drawPile.gd" id="4_638gb"]
+[ext_resource type="Script" path="res://scripts/deckClicked.gd" id="5_c0g2h"]
+[ext_resource type="Script" path="res://scripts/transition.gd" id="6_1smf8"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_st6r8"]
 size = Vector2(240, 336)
 
 [node name="main" type="Node"]
-script = ExtResource("1_afoxg")
+script = ExtResource("1_dle0m")
 
 [node name="shuffleButton" type="Button" parent="."]
 offset_right = 117.0
 offset_bottom = 51.0
 text = "Shuffle"
-script = ExtResource("2_o5w74")
+script = ExtResource("2_6l4ew")
 
 [node name="Hand" type="Node2D" parent="."]
-script = ExtResource("3_a0yt4")
+script = ExtResource("3_ivtwn")
 
 [node name="DrawPile" type="Node2D" parent="."]
-script = ExtResource("3_tts2i")
+script = ExtResource("4_638gb")
 
 [node name="drawPileArea" type="Area2D" parent="DrawPile"]
-script = ExtResource("4_5pbdj")
+script = ExtResource("5_c0g2h")
 
 [node name="drawPileCollision" type="CollisionShape2D" parent="DrawPile/drawPileArea"]
 shape = SubResource("RectangleShape2D_st6r8")
@@ -34,7 +34,7 @@ shape = SubResource("RectangleShape2D_st6r8")
 [node name="DiscardPile" type="Node2D" parent="."]
 
 [node name="Transition" type="Node" parent="."]
-script = ExtResource("5_y3wl2")
+script = ExtResource("6_1smf8")
 
 [connection signal="pressed" from="shuffleButton" to="." method="_on_button_pressed"]
 [connection signal="cardDrawnSignal" from="DrawPile" to="." method="_on_draw_pile_card_drawn_signal"]
