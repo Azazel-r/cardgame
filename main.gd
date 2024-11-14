@@ -19,3 +19,9 @@ func _process(delta: float) -> void:
 
 func _on_button_pressed() -> void:
 	$DrawPile.shuffle()
+
+
+func _on_draw_pile_card_drawn_signal(card : Node2D, cardsDrawn : int) -> void:
+	$Transition.add_child(card)
+	$Transition.cardsDrawn = cardsDrawn
+	

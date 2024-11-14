@@ -44,18 +44,6 @@ func _process(delta: float) -> void:
 	pass
 
 
-func comeToHand(handpos : Vector2, drawn : int) -> void:
-	if onStack:
-		onStack = false
-		inTransition = true
-		tweenToHand = create_tween()
-		tweenToHand.tween_property(self, "position", handpos, SECONDS).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
-		flipCard(SECONDS)
-		tweenToHand.parallel().tween_callback(makeMeInteractable).set_delay(SECONDS)
-		tweenToHand.parallel().tween_callback(makeTransitionStop).set_delay(SECONDS)
-		tweenToHand.parallel().tween_callback(hoverAnimation).set_delay(SECONDS)
-		z_index = drawn
-		
 func makeMeInteractable() -> void:
 	interactable = true
 

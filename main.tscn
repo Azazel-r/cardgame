@@ -1,9 +1,11 @@
-[gd_scene load_steps=6 format=3 uid="uid://mkx1vpfp82w8"]
+[gd_scene load_steps=8 format=3 uid="uid://mkx1vpfp82w8"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_afoxg"]
 [ext_resource type="Script" path="res://shuffleButton.gd" id="2_o5w74"]
+[ext_resource type="Script" path="res://hand.gd" id="3_a0yt4"]
 [ext_resource type="Script" path="res://drawPile.gd" id="3_tts2i"]
 [ext_resource type="Script" path="res://deckClicked.gd" id="4_5pbdj"]
+[ext_resource type="Script" path="res://transition.gd" id="5_y3wl2"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_st6r8"]
 size = Vector2(240, 336)
@@ -18,6 +20,7 @@ text = "Shuffle"
 script = ExtResource("2_o5w74")
 
 [node name="Hand" type="Node2D" parent="."]
+script = ExtResource("3_a0yt4")
 
 [node name="DrawPile" type="Node2D" parent="."]
 script = ExtResource("3_tts2i")
@@ -30,4 +33,11 @@ shape = SubResource("RectangleShape2D_st6r8")
 
 [node name="DiscardPile" type="Node2D" parent="."]
 
+[node name="Transition" type="Node" parent="."]
+script = ExtResource("5_y3wl2")
+
 [connection signal="pressed" from="shuffleButton" to="." method="_on_button_pressed"]
+[connection signal="cardDrawnSignal" from="DrawPile" to="." method="_on_draw_pile_card_drawn_signal"]
+[connection signal="onDrawPileClick" from="DrawPile/drawPileArea" to="DrawPile" method="_on_draw_pile_area_on_draw_pile_click"]
+[connection signal="onDrawPileEnter" from="DrawPile/drawPileArea" to="DrawPile" method="_on_draw_pile_area_on_draw_pile_enter"]
+[connection signal="onDrawPileExit" from="DrawPile/drawPileArea" to="DrawPile" method="_on_draw_pile_area_on_draw_pile_exit"]

@@ -1,21 +1,32 @@
 extends Node2D
 
+# card scene
 const cardScene := preload("res://card.tscn")
-var cards := []
-var cardsInDeck := []
-var DECKPOS := Vector2(0,0)
-var HANDPOS := Vector2(0,0)
-var drawable := true
+
+# just some general variables
 const DOWNTIME := 0.66
-var winSize := Vector2i(0,0)
+const HOVERTIME := 0.33
 var cardsDrawn := 0
 const CARDCOUNT := 12
-var tweener : Tween = null
 const CARDWIDTH := 120
+
+# vectors
+var winSize := Vector2i(0,0)
+var DECKPOS := Vector2(0,0)
+var HANDPOS := Vector2(0,0)
+
+# diverse st8ff
+var drawable := true
+var tweener : Tween = null
+signal cardDrawnSignal(card : Node2D, drawn : int)
+
+# -----------------------------------------------------------------
+# Important functions or smth idk
+# -----------------------------------------------------------------
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	$deckArea/deckCollision.position = DECKPOS
+	$drawPileArea.position = DECKPOS
 	makeDeck()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -27,63 +38,64 @@ func makeDeck() -> void:
 		var card = cardScene.instantiate()
 		card.setSpriteNum((i%2)+1)
 		card.setPos(DECKPOS, i, CARDCOUNT)
-		cards.append(card)
-		cardsInDeck.append(true)
-	
-	for i in range(-1, -len(cards)-1, -1):
-		add_child(cards[i])
-
-func getCardIdxInDeck() -> Array:
-	var erg := []
-	for i in range(CARDCOUNT):
-		if cardsInDeck[i]:
-			erg.append(i)
-	return erg
+		add_child(card)
 
 func shuffle() -> void:
-	var idx := getCardIdxInDeck()
-	for i in idx:
-		var rnd = randi_range(0, len(idx)-1)
-		var temp = cards[idx[rnd]]
-		cards[idx[rnd]] = cards[i]
-		cards[i] = temp
-	for i in idx:
-		cards[i].z_index = CARDCOUNT - i
+	var children := get_children()
+	var idxList := Array(range(len(children)))
+	randomize()
+	idxList.shuffle()
+	for i in range(len(children)):
+		children[i].z_index = idxList[i]
 
-func makeCardInteractable(n : int):
-	cards[n].interactable = true
+func drawCard() -> void:
+	drawable = false
+	var topCard = getTopChild()
+	cardsDrawn += 1
+	var drawtweener = create_tween()
+	drawtweener.tween_callback(makeDeckDrawable).set_delay(DOWNTIME)
+	cardDrawnSignal.emit(topCard, cardsDrawn)
+	remove_child(topCard)
 
-func _on_deck_area_on_deck_click() -> void:
-	var topCard = cardsInDeck.find(true)
-	if topCard != -1 and drawable:
-		drawable = false
-		# make top card come to hand
-		cards[topCard].comeToHand(HANDPOS + Vector2(remap(cardsDrawn, 0, CARDCOUNT-1, CARDWIDTH, winSize.x - CARDWIDTH), 0), cardsDrawn) # TODO
-		cardsInDeck[topCard] = false
-		cardsDrawn += 1
-		var drawtweener = create_tween()
-		drawtweener.tween_callback(makeDeckDrawable).set_delay(DOWNTIME)
-		
+# -----------------------------------------------------------------
+# Helper Functions
+# -----------------------------------------------------------------
+
 func makeDeckDrawable() -> void:
 	drawable = true
-
-func _on_deck_area_on_deck_enter() -> void:
-	const HOVERTIME := 0.33
-	tweener = create_tween()
-	var deckIdx := getCardIdxInDeck()
-	var idx : float = 0
-	for i in deckIdx:
-		tweener.tween_callback(cards[i].hoverAnimation).set_delay(idx/len(deckIdx) * HOVERTIME)
-		idx += 1
-
-func _on_deck_area_on_deck_exit() -> void:
-	if tweener != null:
-		tweener.kill()
-	for i in range(CARDCOUNT):
-		if cardsInDeck[i]:
-			cards[i].resetTweens()
+	
+func getTopChild() -> Node2D:
+	var children := get_children()
+	var erg := children[0]
+	for card in children:
+		if card.z_index > erg:
+			erg = card
+	return erg
 
 func setWindowSize(v : Vector2i) -> void:
 	winSize = v
 	HANDPOS = Vector2(0, 0.75 * winSize.y)
 	DECKPOS = Vector2(0.8 * winSize.x, 0.2 * winSize.y)
+	
+
+# -----------------------------------------------------------------
+# Signal Functions
+# -----------------------------------------------------------------
+
+func _on_draw_pile_area_on_draw_pile_click() -> void:
+	if cardsDrawn < CARDCOUNT and drawable:
+		drawCard()
+
+
+func _on_draw_pile_area_on_draw_pile_enter() -> void:
+	tweener = create_tween()
+	var children = get_children()
+	for i in range(len(children)):
+		tweener.tween_callback(children[i].hoverAnimation).set_delay(i/len(children) * HOVERTIME)
+
+
+func _on_draw_pile_area_on_draw_pile_exit() -> void:
+	if tweener != null:
+		tweener.kill()
+	for card in get_children():
+		card.resetTweens()
