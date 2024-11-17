@@ -1,6 +1,7 @@
 extends Node
 const SECONDS := 0.66
 var cardsDrawn := 0
+signal handReached(card : Node2D)
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -14,11 +15,12 @@ func _process(delta: float) -> void:
 func transToHand(handpos : Vector2) -> void:
 	var card = get_child(0)
 	var tweenToHand = create_tween()
-	tweenToHand.tween_property(card, "position", Vector2(0,0), SECONDS).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
+	tweenToHand.tween_property(card, "position", handpos, SECONDS).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
 	card.flipCard(SECONDS)
 	tweenToHand.parallel().tween_callback(card.makeMeInteractable).set_delay(SECONDS)
 	tweenToHand.parallel().tween_callback(card.makeTransitionStop).set_delay(SECONDS)
-	tweenToHand.parallel().tween_callback(card.hoverAnimation).set_delay(SECONDS)
-	card.z_index = cardsDrawn
-		
-		
+	tweenToHand.parallel().tween_callback(setCardZIndex.bind(card, cardsDrawn)).set_delay(SECONDS)
+	tweenToHand.parallel().tween_callback(handReached.emit.bind(card)).set_delay(SECONDS)
+
+func setCardZIndex(card : Node2D, n : int) -> void:
+	card.z_index = n

@@ -13,7 +13,6 @@ const CARDWIDTH := 120
 # vectors
 var winSize := Vector2i(0,0)
 var DECKPOS := Vector2(0,0)
-var HANDPOS := Vector2(0,0)
 
 # diverse st8ff
 var drawable := true
@@ -26,8 +25,7 @@ signal cardDrawnSignal(card : Node2D, drawn : int)
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	$drawPileArea.position = DECKPOS
-	makeDeck()
+	pass
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
@@ -37,25 +35,39 @@ func makeDeck() -> void:
 	for i in range(CARDCOUNT):
 		var card = cardScene.instantiate()
 		card.setSpriteNum((i%2)+1)
-		card.setPos(DECKPOS, i, CARDCOUNT)
+		card.makeReady(DECKPOS, i)
 		add_child(card)
 
 func shuffle() -> void:
-	var children := get_children()
+	var children := getCardChildren()
 	var idxList := Array(range(len(children)))
+	var tempChilds := []
+	tempChilds.resize(len(children))
 	randomize()
 	idxList.shuffle()
 	for i in range(len(children)):
 		children[i].z_index = idxList[i]
+		tempChilds[children[i].z_index] = children[i]
+	for i in range(len(tempChilds)-1, -1, -1):
+		move_child(tempChilds[len(tempChilds)-i-1], i+1)
+	
 
 func drawCard() -> void:
 	drawable = false
 	var topCard = getTopChild()
+	topCard.resetHover()
+	remove_child(topCard)
 	cardsDrawn += 1
 	var drawtweener = create_tween()
 	drawtweener.tween_callback(makeDeckDrawable).set_delay(DOWNTIME)
 	cardDrawnSignal.emit(topCard, cardsDrawn)
-	remove_child(topCard)
+	
+func hoverDeck() -> void:
+	var children = getCardChildren()
+	if len(children	) > 0:
+		tweener = create_tween()
+		for i in range(len(children)):
+			tweener.tween_callback(children[i].hoverAnimation).set_delay(1.0 * i/len(children) * HOVERTIME)
 
 # -----------------------------------------------------------------
 # Helper Functions
@@ -65,18 +77,18 @@ func makeDeckDrawable() -> void:
 	drawable = true
 	
 func getTopChild() -> Node2D:
-	var children := get_children()
-	var erg := children[0]
-	for card in children:
-		if card.z_index > erg:
-			erg = card
-	return erg
+	if len(get_children()) > 1:
+		return get_children()[1]
+	return null
 
-func setWindowSize(v : Vector2i) -> void:
+func makeReady(v : Vector2i) -> void:
 	winSize = v
-	HANDPOS = Vector2(0, 0.75 * winSize.y)
 	DECKPOS = Vector2(0.8 * winSize.x, 0.2 * winSize.y)
-	
+	$drawPileArea.position = DECKPOS
+	makeDeck()
+
+func getCardChildren() -> Array:
+	return get_children().slice(1,get_child_count())
 
 # -----------------------------------------------------------------
 # Signal Functions
@@ -86,16 +98,11 @@ func _on_draw_pile_area_on_draw_pile_click() -> void:
 	if cardsDrawn < CARDCOUNT and drawable:
 		drawCard()
 
-
 func _on_draw_pile_area_on_draw_pile_enter() -> void:
-	tweener = create_tween()
-	var children = get_children()
-	for i in range(len(children)):
-		tweener.tween_callback(children[i].hoverAnimation).set_delay(i/len(children) * HOVERTIME)
-
+	hoverDeck()
 
 func _on_draw_pile_area_on_draw_pile_exit() -> void:
 	if tweener != null:
 		tweener.kill()
-	for card in get_children():
-		card.resetTweens()
+	for card in getCardChildren():
+		card.resetHover()

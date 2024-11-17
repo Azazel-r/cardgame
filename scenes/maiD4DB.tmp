@@ -41,5 +41,4 @@ script = ExtResource("6_1smf8")
 [connection signal="onDrawPileClick" from="DrawPile/drawPileArea" to="DrawPile" method="_on_draw_pile_area_on_draw_pile_click"]
 [connection signal="onDrawPileEnter" from="DrawPile/drawPileArea" to="DrawPile" method="_on_draw_pile_area_on_draw_pile_enter"]
 [connection signal="onDrawPileExit" from="DrawPile/drawPileArea" to="DrawPile" method="_on_draw_pile_area_on_draw_pile_exit"]
-[connection signal="child_entered_tree" from="Transition" to="Transition" method="_on_child_entered_tree"]
 [connection signal="handReached" from="Transition" to="." method="_on_transition_hand_reached"]

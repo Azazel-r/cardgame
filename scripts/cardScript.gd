@@ -4,16 +4,16 @@ extends Node2D
 signal whichSprite
 signal flipToBack
 signal flipToFront
+signal onEnter(card : Node2D)
+signal onExit(card : Node2D)
+signal onClick(card : Node2D)
 
 # general variables
 var spriteNum := 1
 var cardNumber : int
-var zindexchange : int
 
 # transform variables
 var startPos := Vector2(0,0)
-const SECONDS := 0.66
-const FLIPTIME := 0.5
 var addSkew : float = 0
 
 # bools
@@ -21,7 +21,6 @@ var back := false
 var inTransition := false
 var interactable := false
 var hovering := false
-var onStack : bool
 
 # tween stuff
 var tween : Tween = null
@@ -32,12 +31,7 @@ var tweenToHand : Tween = null
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	position = startPos
-	emit_signal("whichSprite", spriteNum)
-	flipToBack.emit()
-	back = true
-	skew = PI
-	onStack = true
+	pass
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
@@ -52,11 +46,15 @@ func makeTransitionStop() -> void:
 
 func setSpriteNum(n : int) -> void:
 	spriteNum = n
+	emit_signal("whichSprite", spriteNum)
 
-func setPos(start : Vector2, num : int, z : int) -> void:
+func makeReady(start : Vector2, num : int) -> void:
 	startPos = start
 	cardNumber = num
-	zindexchange = z
+	position = startPos
+	flipToBack.emit()
+	back = true
+	skew = PI
 	
 func flipCard(secs : float) -> void:
 	if !back:
@@ -70,24 +68,25 @@ func flipCard(secs : float) -> void:
 		back = true
 	else:
 		tweenTurn = create_tween()
+		tweenScale = create_tween()
 		tweenTurn.tween_property($cardArea, "skew", PI, secs).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
 		tweenTurn.parallel().tween_callback(flipToFront.emit).set_delay(secs/2)
+		tweenScale.tween_property($cardArea, "scale", Vector2(0.5,1), secs/2).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
+		tweenScale.tween_property($cardArea, "scale", Vector2(1,1), secs/2).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
 		addSkew = PI
 		back = false
 
-func hoverAnimation() -> void:
-	if hovering:
-		tween = create_tween()
-		tween.tween_property($cardArea, "scale", Vector2(1.2,1.2), 0.15).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_SINE)
-		tween.parallel().tween_property($cardArea, "skew", addSkew - PI/16, 1.5).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
-		tween2 = create_tween()
-		tween2.tween_property($cardArea, "skew", addSkew + PI/16, 3).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
-		tween2.tween_property($cardArea, "skew", addSkew - PI/16, 3).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
-		tween2.set_loops()
-		if !onStack:
-			z_index += zindexchange
+func hoverAnimation(zindexchange := 0) -> void:
+	tween = create_tween()
+	tween.tween_property($cardArea, "scale", Vector2(1.2,1.2), 0.15).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_SINE)
+	tween.parallel().tween_property($cardArea, "skew", addSkew - PI/16, 1.5).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
+	tween2 = create_tween()
+	tween2.tween_property($cardArea, "skew", addSkew + PI/16, 3).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
+	tween2.tween_property($cardArea, "skew", addSkew - PI/16, 3).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
+	tween2.set_loops()
+	z_index += zindexchange
 
-func resetTweens() -> void:
+func resetHover(zindexchange := 0) -> void:
 	if tween != null:
 		tween.kill()
 	if tween2 != null:
@@ -95,38 +94,25 @@ func resetTweens() -> void:
 	tween = create_tween()
 	tween.tween_property($cardArea, "skew", addSkew, 0.15).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_SINE)
 	tween.parallel().tween_property($cardArea, "scale", Vector2(1,1), 0.15).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_SINE)
-	if !onStack:
-		z_index -= zindexchange
+	z_index -= zindexchange
 
-func resetTweensNoEase() -> void:
+func resetHoverNoEase(zindexchange := 0) -> void:
 	if tween != null:
 		tween.kill()
 	if tween2 != null:
 		tween2.kill()
 	$cardArea.skew = addSkew
 	$cardArea.scale = Vector2(1,1)
-	if !onStack:
-		z_index -= zindexchange
+	z_index -= zindexchange
 	
 
 func _on_card_area_on_click() -> void:
-	if !onStack and interactable:
-		resetTweens()
-		flipCard(FLIPTIME)
-		interactable = false
-		var tmpTween = create_tween()
-		tmpTween.tween_callback(makeMeInteractable).set_delay(FLIPTIME)
-		tmpTween.parallel().tween_callback(hoverAnimation).set_delay(FLIPTIME)
+	onClick.emit(self)
 
 func _on_card_area_on_enter() -> void:
 	hovering = true
-	if interactable and !onStack:
-		hoverAnimation()
-	#print(cardNumber, " skew: ", $cardArea.skew)
+	onEnter.emit(self)
 
 func _on_card_area_on_exit() -> void:
 	hovering = false
-	if inTransition:
-		resetTweensNoEase()
-	elif interactable and !onStack:
-		resetTweens()
+	onExit.emit(self)

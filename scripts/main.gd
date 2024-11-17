@@ -8,7 +8,7 @@ func _ready() -> void:
 	window = get_window()
 	window.size = windowSize
 	window.move_to_center()
-	$DrawPile.setWindowSize(windowSize)
+	$DrawPile.makeReady(windowSize)
 	$DrawPile.shuffle()
 	$Hand.windowSize = windowSize
 	$shuffleButton.position = Vector2(windowSize.x * 0.1, windowSize.y * 0.5)
@@ -23,8 +23,13 @@ func _on_button_pressed() -> void:
 
 
 func _on_draw_pile_card_drawn_signal(card : Node2D, cardsDrawn : int) -> void:
+	var pos = $Hand.getNextCardPos()
 	$Transition.add_child(card)
 	$Transition.cardsDrawn = cardsDrawn
-	var handpos = $Hand.makeSpace(cardsDrawn)
-	
-	
+	$Hand.makeSpace()
+	$Transition.transToHand(pos)
+
+
+func _on_transition_hand_reached(card: Node2D) -> void:
+	$Transition.remove_child(card)
+	$Hand.receiveCard(card)
