@@ -46,7 +46,7 @@ func makeTransitionStop() -> void:
 
 func setSpriteNum(n : int) -> void:
 	spriteNum = n
-	emit_signal("whichSprite", spriteNum)
+	whichSprite.emit(spriteNum)
 
 func makeReady(start : Vector2, num : int) -> void:
 	startPos = start

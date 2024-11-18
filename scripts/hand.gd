@@ -4,6 +4,7 @@ var middleCentered := true
 var margin := 200.0
 var windowSize : Vector2i
 const SHIFTTIME := 0.4
+var hoveredCards := []
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -35,17 +36,25 @@ func receiveCard(card : Node2D) -> void:
 	card.onExit.connect(cardHoverReset)
 	card.onClick.connect(cardClicked)
 	cardHover(card)
-
+	
+func filterStuff(node, currentlyHovered) -> bool:
+	var children := get_children()
+	return children.find(node) > children.find(currentlyHovered)
+	
 func cardHover(card : Node2D) -> void:
 	if card.hovering and card.interactable:
-		card.hoverAnimation(get_child_count())
+		hoveredCards.append(card)
+		if hoveredCards.filter(filterStuff.bind(card)).is_empty():
+			card.hoverAnimation(get_child_count())
 
 func cardHoverReset(card : Node2D) -> void:
 	if card.interactable:
+		hoveredCards.erase(card)
 		card.resetHover(get_child_count())
 	
 func cardHoverResetNoEase(card : Node2D) -> void:
 	if card.interactable:
+		hoveredCards.erase(card)
 		card.resetHoverNoEase(get_child_count())
 
 func cardClicked(card : Node2D) -> void:
