@@ -6,13 +6,11 @@ const cardScene := preload("res://scenes/card.tscn")
 # just some general variables
 const DOWNTIME := 0.66
 const HOVERTIME := 0.33
-var cardsDrawn := 0
 const CARDCOUNT := 12
 const CARDWIDTH := 120
 
 # vectors
-var winSize := Vector2i(0,0)
-var DECKPOS := Vector2(0,0)
+var drawPilePos := Vector2(0,0)
 
 # diverse st8ff
 var drawable := true
@@ -35,7 +33,7 @@ func makeDeck() -> void:
 	for i in range(CARDCOUNT):
 		var card = cardScene.instantiate()
 		card.setSpriteNum((i%2)+1)
-		card.makeReady(DECKPOS, i)
+		card.makeReady(drawPilePos, i)
 		add_child(card)
 
 func shuffle() -> void:
@@ -57,10 +55,9 @@ func drawCard() -> void:
 	var topCard = getTopChild()
 	topCard.resetHover()
 	remove_child(topCard)
-	cardsDrawn += 1
 	var drawtweener = create_tween()
 	drawtweener.tween_callback(makeDeckDrawable).set_delay(DOWNTIME)
-	cardDrawnSignal.emit(topCard, cardsDrawn)
+	cardDrawnSignal.emit(topCard)
 	
 func hoverDeck() -> void:
 	var children = getCardChildren()
@@ -81,10 +78,9 @@ func getTopChild() -> Node2D:
 		return get_children()[1]
 	return null
 
-func makeReady(v : Vector2i) -> void:
-	winSize = v
-	DECKPOS = Vector2(0.8 * winSize.x, 0.2 * winSize.y)
-	$drawPileArea.position = DECKPOS
+func makeReady(v : Vector2) -> void:
+	drawPilePos = v
+	$drawPileArea.position = drawPilePos
 	makeDeck()
 
 func getCardChildren() -> Array:
@@ -95,7 +91,7 @@ func getCardChildren() -> Array:
 # -----------------------------------------------------------------
 
 func _on_draw_pile_area_on_draw_pile_click() -> void:
-	if cardsDrawn < CARDCOUNT and drawable:
+	if get_child_count() > 1 and drawable:
 		drawCard()
 
 func _on_draw_pile_area_on_draw_pile_enter() -> void:
