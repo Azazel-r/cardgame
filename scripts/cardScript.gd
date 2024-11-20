@@ -18,7 +18,6 @@ var addSkew : float = 0
 
 # bools
 var back := false
-var inTransition := false
 var interactable := false
 var hovering := false
 
@@ -40,9 +39,6 @@ func _process(delta: float) -> void:
 
 func makeMeInteractable() -> void:
 	interactable = true
-
-func makeTransitionStop() -> void:
-	inTransition = false
 
 func setSpriteNum(n : int) -> void:
 	spriteNum = n

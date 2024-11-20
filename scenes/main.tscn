@@ -1,13 +1,12 @@
-[gd_scene load_steps=11 format=3 uid="uid://mkx1vpfp82w8"]
+[gd_scene load_steps=10 format=3 uid="uid://mkx1vpfp82w8"]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_dle0m"]
-[ext_resource type="Script" path="res://scripts/shuffleButton.gd" id="2_6l4ew"]
 [ext_resource type="Script" path="res://scripts/hand.gd" id="3_ivtwn"]
 [ext_resource type="Script" path="res://scripts/drawPile.gd" id="4_638gb"]
 [ext_resource type="Script" path="res://scripts/deckClicked.gd" id="5_c0g2h"]
 [ext_resource type="Script" path="res://scripts/transition.gd" id="6_1smf8"]
-[ext_resource type="Script" path="res://scenes/discardPile.gd" id="6_1ykbs"]
-[ext_resource type="Script" path="res://scenes/discardClicked.gd" id="6_3fe58"]
+[ext_resource type="Script" path="res://scripts/discardPile.gd" id="6_1ykbs"]
+[ext_resource type="Script" path="res://scripts/discardClicked.gd" id="6_3fe58"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_st6r8"]
 size = Vector2(240, 336)
@@ -18,11 +17,14 @@ size = Vector2(240, 336)
 [node name="main" type="Node"]
 script = ExtResource("1_dle0m")
 
-[node name="shuffleButton" type="Button" parent="."]
+[node name="startButton" type="Button" parent="."]
 offset_right = 117.0
 offset_bottom = 51.0
 text = "Shuffle"
-script = ExtResource("2_6l4ew")
+
+[node name="Label" type="Label" parent="."]
+offset_right = 40.0
+offset_bottom = 23.0
 
 [node name="Hand" type="Node2D" parent="."]
 script = ExtResource("3_ivtwn")
@@ -48,11 +50,15 @@ shape = SubResource("RectangleShape2D_cjh4m")
 [node name="Transition" type="Node" parent="."]
 script = ExtResource("6_1smf8")
 
-[connection signal="pressed" from="shuffleButton" to="." method="_on_button_pressed"]
+[connection signal="pressed" from="startButton" to="." method="_on_button_pressed"]
+[connection signal="cardDiscarded" from="Hand" to="." method="_on_hand_card_discarded"]
 [connection signal="cardDrawnSignal" from="DrawPile" to="." method="_on_draw_pile_card_drawn_signal"]
 [connection signal="onDrawPileClick" from="DrawPile/drawPileArea" to="DrawPile" method="_on_draw_pile_area_on_draw_pile_click"]
 [connection signal="onDrawPileEnter" from="DrawPile/drawPileArea" to="DrawPile" method="_on_draw_pile_area_on_draw_pile_enter"]
 [connection signal="onDrawPileExit" from="DrawPile/drawPileArea" to="DrawPile" method="_on_draw_pile_area_on_draw_pile_exit"]
-[connection signal="cardDrawnSignal" from="DiscardPile" to="." method="_on_draw_pile_card_drawn_signal"]
+[connection signal="cardDrawnSignal" from="DiscardPile" to="." method="_on_discard_pile_card_drawn_signal"]
+[connection signal="onDiscardPileClick" from="DiscardPile/discardPileArea" to="DiscardPile" method="_on_discard_pile_area_on_discard_pile_click"]
+[connection signal="onDiscardPileEnter" from="DiscardPile/discardPileArea" to="DiscardPile" method="_on_discard_pile_area_on_discard_pile_enter"]
+[connection signal="onDiscardPileExit" from="DiscardPile/discardPileArea" to="DiscardPile" method="_on_discard_pile_area_on_discard_pile_exit"]
 [connection signal="child_entered_tree" from="Transition" to="Transition" method="_on_child_entered_tree"]
-[connection signal="handReached" from="Transition" to="." method="_on_transition_hand_reached"]
+[connection signal="posReached" from="Transition" to="." method="_on_transition_pos_reached"]

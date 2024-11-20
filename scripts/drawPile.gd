@@ -13,7 +13,7 @@ const CARDWIDTH := 120
 var drawPilePos := Vector2(0,0)
 
 # diverse st8ff
-var drawable := true
+var drawable := false
 var tweener : Tween = null
 signal cardDrawnSignal(card : Node2D, drawn : int)
 
@@ -54,7 +54,6 @@ func drawCard() -> void:
 	drawable = false
 	var topCard = getTopChild()
 	topCard.resetHover()
-	remove_child(topCard)
 	var drawtweener = create_tween()
 	drawtweener.tween_callback(makeDeckDrawable).set_delay(DOWNTIME)
 	cardDrawnSignal.emit(topCard)
