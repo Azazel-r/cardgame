@@ -39,11 +39,11 @@ func receiveCard(card : Node2D) -> void:
 	cardHover(card)
 	
 func discardCard(card: Node2D) -> void:
-		cardHoverResetNoEase(card)
-		card.onEnter.disconnect(cardHover)
-		card.onExit.disconnect(cardHoverReset)
-		card.onClick.disconnect(cardClicked)
-		cardDiscarded.emit(card)
+	cardHoverResetNoEase(card)
+	card.onEnter.disconnect(cardHover)
+	card.onExit.disconnect(cardHoverReset)
+	card.onClick.disconnect(cardClicked)
+	cardDiscarded.emit(card)
 
 func cardHover(card : Node2D) -> void:
 	if card.hovering and card.interactable:
