@@ -36,27 +36,27 @@ func _on_button_pressed() -> void:
 	toggleTurn()
 	
 func toggleTurn() -> void:
-	if GameState.playerTurn == 0:
-		GameState.playerTurn = 1
+	if gs.playerTurn == 0:
+		gs.playerTurn = 1
 		$Label.text("NOT your turn.")
 		
-	elif GameState.playerTurn == 1:
-		GameState.playerTurn = 0
+	elif gs.playerTurn == 1:
+		gs.playerTurn = 0
 		$Label.text("Its YOUR turn.")
 
 func _on_draw_pile_card_drawn_signal(card : Node2D) -> void:
 	$DrawPile.remove_child(card)
-	var pos = $Players.get_children()[GameState.playerTurn].getNextCardPos()
+	var pos = $Players.get_children()[gs.playerTurn].getNextCardPos()
 	$Transition.add_child(card)
-	$Players.get_children()[GameState.playerTurn].makeSpace()
-	$Transition.transToPosition(pos, true, "hand", GameState.playerTurn)
+	$Players.get_children()[gs.playerTurn].makeSpace()
+	$Transition.transToPosition(pos, true, "hand", gs.playerTurn)
 	
 func _on_discard_pile_card_drawn_signal(card: Node2D) -> void:
 	$DiscardPile.remove_child(card)
-	var pos = $Players.get_children()[GameState.playerTurn].getNextCardPos()
+	var pos = $Players.get_children()[gs.playerTurn].getNextCardPos()
 	$Transition.add_child(card)
-	$Players.get_children()[GameState.playerTurn].makeSpace()
-	$Transition.transToPosition(pos, false, "hand", GameState.playerTurn)
+	$Players.get_children()[gs.playerTurn].makeSpace()
+	$Transition.transToPosition(pos, false, "hand", gs.playerTurn)
 
 func _on_transition_pos_reached(card: Node2D, end: String) -> void:
 	$Transition.remove_child(card)
@@ -74,4 +74,6 @@ func _on_hand_card_discarded(card: Node2D) -> void:
 	$Transition.transToPosition(pos, false, "discardPile")
 
 func scaleEverythingAccordingly() -> void:
-	pass # TODO
+	const cardScale := (1.0 * windowSize.y / 5) / 336 # 336 = card height!!!!!
+	gs.cardSize = Vector2i(int(floorf(cardScale * 240)),int(floorf(cardScale * 336)))
+	gs.margin = Vector2i(int(1.0 * windowSize.x / 50), int(1.0 * windowSize.y / 40))

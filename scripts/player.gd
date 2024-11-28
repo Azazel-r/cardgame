@@ -1,12 +1,13 @@
 extends Node
 
 var index := 0
-var polySize := Vector2(GameState.numCards * 300 + 60, 420)
-var winSize = get_window().size
+var polySize := Vector2(gs.numCards * 300 + 60, 420)
+var winSize : Vector2i
 var handPos := Vector2(winSize.x * 0.5, winSize.y * 0.75)
 
 func setup(idx : int):
 	print(polySize)
+	winSize = get_window().size
 	index = idx
 	var polyVectors : PackedVector2Array
 	polyVectors.resize(4)

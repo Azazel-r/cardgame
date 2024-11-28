@@ -1,0 +1,61 @@
+[gd_scene load_steps=9 format=3 uid="uid://mkx1vpfp82w8"]
+
+[ext_resource type="Script" path="res://scripts/main.gd" id="1_dle0m"]
+[ext_resource type="Script" path="res://scripts/drawPile.gd" id="4_638gb"]
+[ext_resource type="Script" path="res://scripts/deckClicked.gd" id="5_c0g2h"]
+[ext_resource type="Script" path="res://scripts/transition.gd" id="6_1smf8"]
+[ext_resource type="Script" path="res://scripts/discardPile.gd" id="6_1ykbs"]
+[ext_resource type="Script" path="res://scripts/discardClicked.gd" id="6_3fe58"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_st6r8"]
+size = Vector2(240, 336)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_cjh4m"]
+size = Vector2(240, 336)
+
+[node name="main" type="Node"]
+script = ExtResource("1_dle0m")
+
+[node name="startButton" type="Button" parent="."]
+offset_right = 117.0
+offset_bottom = 51.0
+text = "Shuffle"
+
+[node name="Label" type="Label" parent="."]
+offset_right = 40.0
+offset_bottom = 23.0
+
+[node name="DrawPile" type="Node2D" parent="."]
+script = ExtResource("4_638gb")
+
+[node name="drawPileArea" type="Area2D" parent="DrawPile"]
+script = ExtResource("5_c0g2h")
+
+[node name="drawPileCollision" type="CollisionShape2D" parent="DrawPile/drawPileArea"]
+shape = SubResource("RectangleShape2D_st6r8")
+
+[node name="DiscardPile" type="Node2D" parent="."]
+script = ExtResource("6_1ykbs")
+
+[node name="discardPileArea" type="Area2D" parent="DiscardPile"]
+script = ExtResource("6_3fe58")
+
+[node name="discardPileCollision" type="CollisionShape2D" parent="DiscardPile/discardPileArea"]
+shape = SubResource("RectangleShape2D_cjh4m")
+
+[node name="Transition" type="Node" parent="."]
+script = ExtResource("6_1smf8")
+
+[node name="Players" type="Node" parent="."]
+
+[connection signal="pressed" from="startButton" to="." method="_on_button_pressed"]
+[connection signal="cardDrawnSignal" from="DrawPile" to="." method="_on_draw_pile_card_drawn_signal"]
+[connection signal="onDrawPileClick" from="DrawPile/drawPileArea" to="DrawPile" method="_on_draw_pile_area_on_draw_pile_click"]
+[connection signal="onDrawPileEnter" from="DrawPile/drawPileArea" to="DrawPile" method="_on_draw_pile_area_on_draw_pile_enter"]
+[connection signal="onDrawPileExit" from="DrawPile/drawPileArea" to="DrawPile" method="_on_draw_pile_area_on_draw_pile_exit"]
+[connection signal="cardDrawnSignal" from="DiscardPile" to="." method="_on_discard_pile_card_drawn_signal"]
+[connection signal="onDiscardPileClick" from="DiscardPile/discardPileArea" to="DiscardPile" method="_on_discard_pile_area_on_discard_pile_click"]
+[connection signal="onDiscardPileEnter" from="DiscardPile/discardPileArea" to="DiscardPile" method="_on_discard_pile_area_on_discard_pile_enter"]
+[connection signal="onDiscardPileExit" from="DiscardPile/discardPileArea" to="DiscardPile" method="_on_discard_pile_area_on_discard_pile_exit"]
+[connection signal="child_entered_tree" from="Transition" to="Transition" method="_on_child_entered_tree"]
+[connection signal="posReached" from="Transition" to="." method="_on_transition_pos_reached"]
