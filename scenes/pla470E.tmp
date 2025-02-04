@@ -15,6 +15,3 @@ script = ExtResource("2_pmejy")
 
 [node name="handAreaPoly" type="Polygon2D" parent="."]
 color = Color(1, 1, 1, 0.313726)
-
-[connection signal="cardDiscarded" from="Hand" to="." method="_on_hand_card_discarded"]
-[connection signal="cardDiscarded" from="Limbo" to="." method="_on_limbo_card_discarded"]

@@ -3,14 +3,6 @@ extends Node2D
 # card scene
 const cardScene := preload("res://scenes/card.tscn")
 
-# just some general variables
-const HOVERTIME := 0.33
-const CARDCOUNT := 12
-const CARDWIDTH := 120
-
-# vectors
-var drawPilePos := Vector2(0,0)
-
 # diverse st8ff
 var drawable := true
 var tweener : Tween = null
@@ -29,10 +21,10 @@ func _process(delta: float) -> void:
 	pass
 
 func makeDeck() -> void:
-	for i in range(CARDCOUNT):
+	for i in range(gs.CARD_COUNT):
 		var card = cardScene.instantiate()
 		card.setSpriteNum((i%2)+1)
-		card.makeReady(drawPilePos, i)
+		card.makeReady(gs.drawPilePos, i)
 		add_child(card)
 
 func shuffle() -> void:
@@ -62,7 +54,7 @@ func hoverDeck() -> void:
 	if len(children) > 0:
 		tweener = create_tween()
 		for i in range(len(children)):
-			tweener.tween_callback(children[i].hoverAnimation).set_delay(1.0 * i/len(children) * HOVERTIME)
+			tweener.tween_callback(children[i].hoverAnimation).set_delay(1.0 * i/len(children) * gs.HOVER_TIME)
 
 # -----------------------------------------------------------------
 # Helper Functions
@@ -76,9 +68,8 @@ func getTopChild() -> Node2D:
 		return get_children()[1]
 	return null
 
-func makeReady(v : Vector2) -> void:
-	drawPilePos = v
-	$drawPileArea.position = drawPilePos
+func makeReady() -> void:
+	$drawPileArea.position = gs.drawPilePos
 	makeDeck()
 
 func getCardChildren() -> Array:

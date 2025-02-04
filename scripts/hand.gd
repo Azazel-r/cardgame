@@ -62,5 +62,6 @@ func cardHoverResetNoEase(card : Node2D) -> void:
 		card.resetHoverNoEase(get_child_count())
 
 func cardClicked(card : Node2D) -> void:
+	# TODO: make it so that you can only discard when a card is in limbo. and replace hand card with limbo card
 	if card.interactable:
 		discardCard(card)
