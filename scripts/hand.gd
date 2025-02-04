@@ -1,8 +1,8 @@
 extends Node2D
 
 var middleCentered := true
-var margin := 200.0
 var windowSize : Vector2i
+var handPos := Vector2(0,0)
 const SHIFTTIME := 0.4
 signal cardDiscarded(card : Node2D)
 
@@ -15,21 +15,19 @@ func _process(delta: float) -> void:
 	pass
 
 func getNextCardPos() -> Vector2:
-	var Y := windowSize.y * 0.75
 	if (get_child_count() == 0):
-		return Vector2(windowSize.x * 0.5, Y)
+		return handPos
 	else:
-		return Vector2(windowSize.x - margin, Y)
+		return Vector2(handPos.x + gs.margin, handPos.y)
 
 func makeSpace() -> void:
-	var Y := windowSize.y * 0.75
 	var children := get_children()
 	var count := get_child_count()
 	for i in range(count):
-		var pos = remap(i, 0, count, margin, windowSize.x - margin)
+		var pos = remap(i, 0, count, handPos.x - gs.margin, handPos.x + gs.margin)
 		var tweener = create_tween()
-		tweener.tween_property(children[i], "position", Vector2(pos, Y), SHIFTTIME).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
-	
+		tweener.tween_property(children[i], "position", Vector2(pos, handPos.y), SHIFTTIME).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
+
 func receiveCard(card : Node2D) -> void:
 	card.interactable = true
 	card.z_index = get_child_count()-1
@@ -44,6 +42,12 @@ func discardCard(card: Node2D) -> void:
 	card.onExit.disconnect(cardHoverReset)
 	card.onClick.disconnect(cardClicked)
 	cardDiscarded.emit(card)
+	
+func showCards(cardIdx: Array, seconds: float) -> void:
+	for i in cardIdx:
+		get_child(i).flipCard(gs.JUST_FLIP_SECONDS)
+		var temptween = create_tween()
+		temptween.tween_callback(get_child(i).flipCard.bind(gs.JUST_FLIP_SECONDS)).set_delay(seconds + gs.JUST_FLIP_SECONDS)
 
 func cardHover(card : Node2D) -> void:
 	if card.hovering and card.interactable:

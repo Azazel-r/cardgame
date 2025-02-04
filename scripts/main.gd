@@ -5,9 +5,8 @@ var started := false
 
 var window
 const windowSize := Vector2i(1920,1080) #Vector2i(1280,720) #
-const drawPilePos := Vector2(0.8 * windowSize.x, 0.2 * windowSize.y)
+const drawPilePos := Vector2(0.9 * windowSize.x, 0.2 * windowSize.y)
 const discardPilePos := Vector2(0.6 * windowSize.x, 0.2 * windowSize.y)
-const playerCount := 1
 
 const playerScene := preload("res://scenes/player.tscn")
 
@@ -15,65 +14,104 @@ const playerScene := preload("res://scenes/player.tscn")
 func _ready() -> void:
 	window = get_window()
 	window.size = windowSize
+	gs.winSize = windowSize
 	window.move_to_center()
+	scaleEverythingAccordingly(0.66) # juhu
 	
 	#Playerstuff
-	for i in range(playerCount):
+	var gap = remap(clampf(gs.scale,0.0,1.0), 0, 1, 0, 0.25)
+	gs.handPos1 = Vector2(windowSize.x * 0.5, windowSize.y * (1-gap))
+	gs.handPos2 = Vector2(windowSize.x * 0.5, windowSize.y * gap)
+	for i in range(gs.PLAYER_COUNT):
 		var playerInstance := playerScene.instantiate()
 		$Players.add_child(playerInstance)
-		
-	
+		playerInstance.setup(i)
+			
 	$DrawPile.makeReady(drawPilePos)
 	$DrawPile.shuffle()
 	$DiscardPile.makeReady(discardPilePos)
 	$startButton.position = Vector2(windowSize.x * 0.1, windowSize.y * 0.5)
+	
+	gameStart()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	pass
 
 func _on_button_pressed() -> void:
-	toggleTurn()
+	showCards([0,1],[0,3],2)
+	# toggleTurn()
+	# print("P1 has: ", $Players.get_children()[0].get_child(0).get_child_count(), " cards in Hand.")
+	# print("P2 has: ", $Players.get_children()[1].get_child(0).get_child_count(), " cards in Hand.")
 	
+func gameStart() -> void:
+	# give 4 cards to each player
+	var dtime = gs.START_DRAW_DELAY
+	var drawtweener = create_tween()
+	# drawtweener.tween_callback(showCards.bind())
+	for i in range(gs.NUM_HAND_CARDS):
+		drawtweener.parallel().tween_callback($DrawPile.drawCard.bind(0, false)).set_delay((2*i*dtime) + dtime)
+		drawtweener.parallel().tween_callback($DrawPile.makeDeckDrawable).set_delay((2*i*dtime) + dtime + 0.01)
+		#
+		drawtweener.parallel().tween_callback($DrawPile.drawCard.bind(1, false)).set_delay((2*i*dtime) + 2*dtime)
+		drawtweener.parallel().tween_callback($DrawPile.makeDeckDrawable).set_delay((2*i*dtime) + 2*dtime + 0.01)
+		
+func showCards(players: Array, cardIdx: Array, seconds: float) -> void:
+	for p in players:
+		$Players.get_child(p).get_child(0).showCards(cardIdx, seconds)
+
 func toggleTurn() -> void:
 	if gs.playerTurn == 0:
 		gs.playerTurn = 1
-		$Label.text("NOT your turn.")
+		$Label.text = "NOT your turn."
 		
 	elif gs.playerTurn == 1:
 		gs.playerTurn = 0
-		$Label.text("Its YOUR turn.")
+		$Label.text = "It's YOUR turn."
 
-func _on_draw_pile_card_drawn_signal(card : Node2D) -> void:
+func _on_draw_pile_card_drawn_signal(card : Node2D, player: int, limbo: bool) -> void:
 	$DrawPile.remove_child(card)
-	var pos = $Players.get_children()[gs.playerTurn].getNextCardPos()
+	var pos = $Players.get_children()[player].getNextCardPos()
 	$Transition.add_child(card)
-	$Players.get_children()[gs.playerTurn].makeSpace()
-	$Transition.transToPosition(pos, true, "hand", gs.playerTurn)
+	$Players.get_children()[player].makeSpace()
+	var destination : String
+	if limbo:
+		destination = "limbo1" if player == 0 else "limbo2"
+	else:
+		destination = "hand1" if player == 0 else "hand2"
+	$Transition.transToPosition(pos, false, destination)
 	
 func _on_discard_pile_card_drawn_signal(card: Node2D) -> void:
 	$DiscardPile.remove_child(card)
 	var pos = $Players.get_children()[gs.playerTurn].getNextCardPos()
 	$Transition.add_child(card)
 	$Players.get_children()[gs.playerTurn].makeSpace()
-	$Transition.transToPosition(pos, false, "hand", gs.playerTurn)
+	$Transition.transToPosition(pos, false, "hand")
 
 func _on_transition_pos_reached(card: Node2D, end: String) -> void:
 	$Transition.remove_child(card)
-	if end == "hand":
-		$Hand.add_child(card) # TODO remove $Hand everywhere and stuff
-		$Hand.receiveCard(card)
+	if end == "hand1":
+		$Players.get_children()[0].receive_card(card)
+	elif end == "hand2":
+		$Players.get_children()[1].receive_card(card)
 	elif end == "discardPile":
 		$DiscardPile.add_child(card)
 		$DiscardPile.receiveCard(card)
 
 func _on_hand_card_discarded(card: Node2D) -> void:
-	$Hand.remove_child(card)
+	$Players.get_children()[gs.playerTurn].remove_card(card)
 	var pos = $DiscardPile.discardPilePos
 	$Transition.add_child(card)
 	$Transition.transToPosition(pos, false, "discardPile")
 
-func scaleEverythingAccordingly() -> void:
+func scaleEverythingAccordingly(scale: float) -> void:
+	# gs.cardSize = Vector2i(int(floorf(scale * gs.cardSize.x)), int(floorf(scale * gs.cardSize.y)))
+	gs.cardScale = Vector2(scale, scale)
+	gs.margin *= scale
+	gs.scale = scale
+	
+	"""
 	const cardScale := (1.0 * windowSize.y / 5) / 336 # 336 = card height!!!!!
 	gs.cardSize = Vector2i(int(floorf(cardScale * 240)),int(floorf(cardScale * 336)))
 	gs.margin = Vector2i(int(1.0 * windowSize.x / 50), int(1.0 * windowSize.y / 40))
+	"""

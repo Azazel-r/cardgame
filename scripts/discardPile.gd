@@ -1,7 +1,6 @@
 extends Node2D
 
 var drawable := true
-const DOWNTIME := 0.66
 signal cardDrawnSignal(card : Node2D)
 var discardPilePos = Vector2(0,0)
 
@@ -18,7 +17,7 @@ func drawCard() -> void:
 	var topCard = getTopChild()
 	topCard.resetHover()
 	var drawtweener = create_tween()
-	drawtweener.tween_callback(makeDeckDrawable).set_delay(DOWNTIME)
+	drawtweener.tween_callback(makeDeckDrawable).set_delay(gs.DRAWDOWNTIME)
 	cardDrawnSignal.emit(topCard)
 
 func getTopChild() -> Node2D:

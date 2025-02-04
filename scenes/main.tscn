@@ -19,7 +19,7 @@ script = ExtResource("1_dle0m")
 [node name="startButton" type="Button" parent="."]
 offset_right = 117.0
 offset_bottom = 51.0
-text = "Shuffle"
+text = "Flip Cards"
 
 [node name="Label" type="Label" parent="."]
 offset_right = 40.0

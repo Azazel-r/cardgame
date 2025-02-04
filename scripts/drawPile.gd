@@ -4,7 +4,6 @@ extends Node2D
 const cardScene := preload("res://scenes/card.tscn")
 
 # just some general variables
-const DOWNTIME := 0.66
 const HOVERTIME := 0.33
 const CARDCOUNT := 12
 const CARDWIDTH := 120
@@ -13,9 +12,9 @@ const CARDWIDTH := 120
 var drawPilePos := Vector2(0,0)
 
 # diverse st8ff
-var drawable := false
+var drawable := true
 var tweener : Tween = null
-signal cardDrawnSignal(card : Node2D, drawn : int)
+signal cardDrawnSignal(card : Node2D, player : int, limbo: bool)
 
 # -----------------------------------------------------------------
 # Important functions or smth idk
@@ -50,17 +49,17 @@ func shuffle() -> void:
 		move_child(tempChilds[len(tempChilds)-i-1], i+1)
 	
 
-func drawCard() -> void:
+func drawCard(player: int = gs.playerTurn, limbo: bool = true) -> void:
 	drawable = false
 	var topCard = getTopChild()
 	topCard.resetHover()
-	var drawtweener = create_tween()
-	drawtweener.tween_callback(makeDeckDrawable).set_delay(DOWNTIME)
-	cardDrawnSignal.emit(topCard)
+	# var drawtweener = create_tween()
+	# drawtweener.tween_callback(makeDeckDrawable).set_delay(gs.DRAW_DOWNTIME)
+	cardDrawnSignal.emit(topCard, player, limbo)
 	
 func hoverDeck() -> void:
 	var children = getCardChildren()
-	if len(children	) > 0:
+	if len(children) > 0:
 		tweener = create_tween()
 		for i in range(len(children)):
 			tweener.tween_callback(children[i].hoverAnimation).set_delay(1.0 * i/len(children) * HOVERTIME)
