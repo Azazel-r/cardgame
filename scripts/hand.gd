@@ -3,7 +3,6 @@ extends Node2D
 var middleCentered := true
 var windowSize : Vector2i
 var handPos := Vector2(0,0)
-const SHIFTTIME := 0.4
 signal cardDiscarded(card : Node2D)
 
 # Called when the node enters the scene tree for the first time.
@@ -26,7 +25,7 @@ func makeSpace() -> void:
 	for i in range(count):
 		var pos = remap(i, 0, count, handPos.x - gs.margin, handPos.x + gs.margin)
 		var tweener = create_tween()
-		tweener.tween_property(children[i], "position", Vector2(pos, handPos.y), SHIFTTIME).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
+		tweener.tween_property(children[i], "position", Vector2(pos, handPos.y), gs.SHIFT_TIME).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
 
 func receiveCard(card : Node2D) -> void:
 	card.interactable = false
@@ -35,6 +34,15 @@ func receiveCard(card : Node2D) -> void:
 	card.onExit.connect(cardHoverReset)
 	card.onClick.connect(cardClicked)
 	cardHover(card)
+	
+func receiveLimboCard(card: Node2D) -> void:
+	card.interactable = false
+	card.z_index = 0 # TODO mach endlich mal was mit den z indexen
+	card.onEnter.connect(cardHover)
+	card.onExit.connect(cardHoverReset)
+	card.onClick.connect(cardClicked)
+	print("signals connected, card received from limbo")
+	card.resetHover() # here!!
 	
 func discardCard(card: Node2D) -> void:
 	cardHoverResetNoEase(card)
@@ -62,5 +70,7 @@ func cardHoverResetNoEase(card : Node2D) -> void:
 		card.resetHoverNoEase(get_child_count())
 
 func cardClicked(card : Node2D) -> void:
+	print("interactable: ", card.interactable)
+	print("discarding card ", card)
 	if card.interactable:
 		discardCard(card)

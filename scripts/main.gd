@@ -103,17 +103,21 @@ func _on_transition_pos_reached(card: Node2D, end: String) -> void:
 		$Players.get_child(1).limboCard(card)
 	elif end == "discardPile":
 		$DiscardPile.receiveCard(card)
+	elif end == "limboToHand1":
+		$Players.get_child(0).limboCardToHand(card)
+	elif end == "limboToHand2":
+		$Players.get_child(1).limboCardToHand(card)
 
 func _on_hand_card_discarded(card: Node2D, player: int, limbocard: Node2D) -> void:
 	var pos = gs.discardPilePos
 	var pos2 = card.position
 	$Transition.transToPosition(card, pos, true, "discardPile")
-	$Players.get_child(player).get_child(1).remove_child(limbocard)
-	$Transition.transToPosition(limbocard, pos2, true, "hand1" if player == 0 else "hand2") # TODO iwas geht nicht wenn 2x ausgetauscht wird oder so
+	$Transition.transToPosition(limbocard, pos2, true, "limboToHand1" if player == 0 else "limboToHand2") # TODO iwas geht nicht wenn 2x ausgetauscht wird oder so
 	$DrawPile.drawable = true
 
 func _on_limbo_card_discarded(card: Node2D, player: int) -> void:
-	var pos = gs.discardPilePos
+	var pos = gs.discardPilePos#
+	print("limbo discard wird aufgerufen")
 	$Transition.transToPosition(card, pos, false, "discardPile")
 	$DrawPile.drawable = true
 

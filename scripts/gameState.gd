@@ -11,8 +11,9 @@ const TRANSITION_SECONDS := 0.33
 const START_DRAW_DELAY := 0.25
 const JUST_FLIP_SECONDS := 0.33
 const HOVER_TIME := 0.33
+const SHIFT_TIME := 0.4
 
-# Position constants (Vector2Ds usually)
+# Position constants (Vector2Ds usually) (set later by main)
 var handPos1 := Vector2.ZERO
 var handPos2 := Vector2.ZERO
 var limboPos := Vector2.ZERO

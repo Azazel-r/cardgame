@@ -42,7 +42,10 @@ func cardClicked(card : Node2D) -> void:
 
 func discardCard(card: Node2D) -> void:
 	cardHoverResetNoEase(card)
+	disconnectAll(card)
+	cardDiscarded.emit(card)
+	
+func disconnectAll(card: Node2D) -> void:
 	card.onEnter.disconnect(cardHover)
 	card.onExit.disconnect(cardHoverReset)
 	card.onClick.disconnect(cardClicked)
-	cardDiscarded.emit(card)

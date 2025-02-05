@@ -41,6 +41,12 @@ func receive_card(card: Node2D) -> void:
 	$Hand.add_child(card)
 	$Hand.receiveCard(card)
 	
+func limboCardToHand(card: Node2D) -> void:
+	$Limbo.remove_child(card)
+	card.disconnectAll()
+	$Hand.add_child(card)
+	$Hand.receiveLimboCard(card)
+	
 func limboCard(card: Node2D) -> void:
 	$Limbo.receiveCard(card)
 	$Limbo.add_child(card)
@@ -48,11 +54,18 @@ func limboCard(card: Node2D) -> void:
 		c.interactable = true
 
 func _on_limbo_card_discarded(card: Node2D) -> void:
-	$Limbo.remove_child(card)
-	limboCardDiscarded.emit(card, index)
+	# this means there has to be a card in limbo but just in case check
+	if $Limbo.get_child_count() > 0:
+		$Limbo.remove_child(card)
+		card.interactable = false
+		limboCardDiscarded.emit(card, index)
+		for c in $Hand.get_children():
+			c.interactable = false
 
 func _on_hand_card_discarded(card: Node2D) -> void:
-	for c in $Hand.get_children():
-		c.interactable = false
-	$Hand.remove_child(card)
-	handCardDiscarded.emit(card, index, $Limbo.get_child(0))
+	# this means there has to be a card in limbo but just in case check
+	if $Limbo.get_child_count() > 0:
+		for c in $Hand.get_children():
+			c.interactable = false
+		$Hand.remove_child(card)
+		handCardDiscarded.emit(card, index, $Limbo.get_child(0))
