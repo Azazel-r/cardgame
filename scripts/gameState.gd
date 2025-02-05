@@ -8,7 +8,7 @@ extends Node
 # Time constants (delays, etc)
 const DRAW_DOWNTIME := 0.66
 const TRANSITION_SECONDS := 0.33
-const START_DRAW_DELAY := 0.66
+const START_DRAW_DELAY := 0.25
 const JUST_FLIP_SECONDS := 0.33
 const HOVER_TIME := 0.33
 

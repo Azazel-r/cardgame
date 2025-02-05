@@ -3,7 +3,7 @@ extends Node
 var index := 0
 var polySize := gs.cardScale * Vector2(gs.NUM_HAND_CARDS * 300 + 60, 420)
 var winSize := gs.winSize
-signal handCardDiscarded(card: Node2D, player: int)
+signal handCardDiscarded(card: Node2D, player: int, limbocard: Node2D)
 signal limboCardDiscarded(card: Node2D, player: int)
 
 func setup(idx : int):
@@ -44,16 +44,15 @@ func receive_card(card: Node2D) -> void:
 func limboCard(card: Node2D) -> void:
 	$Limbo.receiveCard(card)
 	$Limbo.add_child(card)
+	for c in $Hand.get_children():
+		c.interactable = true
 
 func _on_limbo_card_discarded(card: Node2D) -> void:
 	$Limbo.remove_child(card)
 	limboCardDiscarded.emit(card, index)
 
 func _on_hand_card_discarded(card: Node2D) -> void:
+	for c in $Hand.get_children():
+		c.interactable = false
 	$Hand.remove_child(card)
-	handCardDiscarded.emit(card, index)
-	if $Hand.get_child_count() > 0:
-		var tmpTween = create_tween()
-		for c in $Hand.get_children():
-			c.interactable = false
-			tmpTween.parallel().tween_callback(c.makeMeInteractable).set_delay(gs.TRANSITION_SECONDS)
+	handCardDiscarded.emit(card, index, $Limbo.get_child(0))

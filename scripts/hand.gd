@@ -29,7 +29,7 @@ func makeSpace() -> void:
 		tweener.tween_property(children[i], "position", Vector2(pos, handPos.y), SHIFTTIME).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
 
 func receiveCard(card : Node2D) -> void:
-	card.interactable = true
+	card.interactable = false
 	card.z_index = get_child_count()-1
 	card.onEnter.connect(cardHover)
 	card.onExit.connect(cardHoverReset)
@@ -62,6 +62,5 @@ func cardHoverResetNoEase(card : Node2D) -> void:
 		card.resetHoverNoEase(get_child_count())
 
 func cardClicked(card : Node2D) -> void:
-	# TODO: make it so that you can only discard when a card is in limbo. and replace hand card with limbo card
 	if card.interactable:
 		discardCard(card)

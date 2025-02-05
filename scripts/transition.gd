@@ -9,8 +9,8 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	pass
 
-func transToPosition(pos : Vector2, flip : bool, end : String) -> void:
-	var card = get_child(0)
+func transToPosition(card : Node2D, pos : Vector2, flip : bool, end : String) -> void:
+	add_child(card)
 	var tweenToHand = create_tween()
 	tweenToHand.tween_property(card, "position", pos, gs.TRANSITION_SECONDS).set_ease(Tween.EASE_IN_OUT).set_trans(Tween.TRANS_SINE)
 	if flip:

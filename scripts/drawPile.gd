@@ -45,6 +45,7 @@ func drawCard(player: int = gs.playerTurn, limbo: bool = true) -> void:
 	drawable = false
 	var topCard = getTopChild()
 	topCard.resetHover()
+	topCard.interactable = false
 	# var drawtweener = create_tween()
 	# drawtweener.tween_callback(makeDeckDrawable).set_delay(gs.DRAW_DOWNTIME)
 	cardDrawnSignal.emit(topCard, player, limbo)

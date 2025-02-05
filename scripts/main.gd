@@ -75,22 +75,21 @@ func toggleTurn() -> void:
 func _on_draw_pile_card_drawn_signal(card : Node2D, player: int, limbo: bool) -> void:
 	var destination : String
 	$DrawPile.remove_child(card)
-	$Transition.add_child(card)
 	if limbo:
 		destination = "limbo1" if player == 0 else "limbo2"
-		$Transition.transToPosition(gs.limboPos, true, destination)
+		$Transition.transToPosition(card, gs.limboPos, true, destination)
 	else:
 		destination = "hand1" if player == 0 else "hand2"
-		var pos = $Players.get_children()[player].getNextCardPos()
-		$Players.get_children()[player].makeSpace()
-		$Transition.transToPosition(pos, false, destination)
+		var pos = $Players.get_child(player).getNextCardPos()
+		$Players.get_child(player).makeSpace()
+		$Transition.transToPosition(card, pos, false, destination)
 	
 func _on_discard_pile_card_drawn_signal(card: Node2D) -> void:
+	# TODO ZU ÜBERARBEITEN!!
 	$DiscardPile.remove_child(card)
 	var pos = $Players.get_children()[gs.playerTurn].getNextCardPos()
-	$Transition.add_child(card)
 	$Players.get_children()[gs.playerTurn].makeSpace()
-	$Transition.transToPosition(pos, false, "hand")
+	$Transition.transToPosition(card, pos, false, "hand")
 
 func _on_transition_pos_reached(card: Node2D, end: String) -> void:
 	$Transition.remove_child(card)
@@ -105,15 +104,17 @@ func _on_transition_pos_reached(card: Node2D, end: String) -> void:
 	elif end == "discardPile":
 		$DiscardPile.receiveCard(card)
 
-func _on_hand_card_discarded(card: Node2D, player: int) -> void:
+func _on_hand_card_discarded(card: Node2D, player: int, limbocard: Node2D) -> void:
 	var pos = gs.discardPilePos
-	$Transition.add_child(card)
-	$Transition.transToPosition(pos, true, "discardPile")
+	var pos2 = card.position
+	$Transition.transToPosition(card, pos, true, "discardPile")
+	$Players.get_child(player).get_child(1).remove_child(limbocard)
+	$Transition.transToPosition(limbocard, pos2, true, "hand1" if player == 0 else "hand2") # TODO iwas geht nicht wenn 2x ausgetauscht wird oder so
+	$DrawPile.drawable = true
 
 func _on_limbo_card_discarded(card: Node2D, player: int) -> void:
 	var pos = gs.discardPilePos
-	$Transition.add_child(card)
-	$Transition.transToPosition(pos, false, "discardPile")
+	$Transition.transToPosition(card, pos, false, "discardPile")
 	$DrawPile.drawable = true
 
 func scaleEverythingAccordingly(scale: float) -> void:
